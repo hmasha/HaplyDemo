@@ -30,6 +30,9 @@ private final ScheduledExecutorService scheduler      = Executors.newScheduledTh
 
 
 /* device block definitions ********************************************************************************************/
+
+
+
 Board             haplyBoard;
 Device            widgetOne;
 Mechanisms        pantograph;
@@ -71,6 +74,8 @@ float             edgeTopLeftX                        = 0.0;
 float             edgeTopLeftY                        = 0.0; 
 float             edgeBottomRightX                    = worldWidth; 
 float             edgeBottomRightY                    = worldHeight;
+float             check1                              =0;
+float             check2                              =0;
 
 /* Initialization of virtual tool */
 HVirtualCoupling  s;
@@ -79,22 +84,25 @@ PImage            haply_avatar;
 /* ground*/
 FBox obs1;
 FBox obs2;
-PImage bg;
-
+FBox obs3;
+FBox obs4;
+FBox obs5;
 /* background shapes */
-FBox square_light;
-FBox square_dense;
+PImage img;
 
 /* end elements definition *********************************************************************************************/
 
 /* setup section *******************************************************************************************************/
 void setup() {
+
+  // Parameters go inside the parentheses when the object is constructed.
+  
   /* put setup code here, run once: */
 
   /* screen size definition */
   size(1000, 400);
-  bg = loadImage("img/forestfloor.jpg");
-
+  img = loadImage("img/dirt.jpg");
+  background(img);
   /* device setup */
 
   /**  
@@ -106,10 +114,13 @@ void setup() {
    *      linux:        haplyBoard = new Board(this, "/dev/ttyUSB0", 0);
    *      mac:          haplyBoard = new Board(this, "/dev/cu.usbmodem1411", 0);
    */
-  haplyBoard          = new Board(this, Serial.list()[1], 0);
-  widgetOne           = new Device(widgetOneID, haplyBoard);
-  pantograph          = new Pantograph();
+   print(Serial.list());
 
+  haplyBoard          = new Board(this, Serial.list()[7], 0);
+  widgetOne           = new Device(widgetOneID, haplyBoard);
+  
+  pantograph          = new Pantograph();
+  
   widgetOne.set_mechanism(pantograph);
 
   widgetOne.add_actuator(1, CW, 1);
@@ -127,20 +138,87 @@ void setup() {
   world               = new FWorld();
 
 
+
   /* Setup obstacles */
-  obs1 = new FBox(3, 2);
-  obs2 = new FBox(2, 1);
-  obs1.setPosition(worldWidth*1/3, worldHeight*1/3);
-  obs2.setPosition(worldWidth-5, 2);
-  obs1.setRotation(3);
+  obs1 = new FBox(1, 8);
+ // obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-2, 2);
   obs1.setFill(0, 0, 0);
-  obs2.setFill(0 ,0, 0);
   obs1.setStatic(true);
-  obs2.setStatic(true);
   world.add(obs1);
-  world.add(obs2);
-
-
+  
+   obs1 = new FBox(1, 4);
+  //obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-5, 8);
+  obs1.setFill(0, 0, 0);
+  obs1.setStatic(true);
+  world.add(obs1);
+  
+  
+   obs1 = new FBox(1, 3);
+ // obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-5, 2);
+  obs1.setFill(0, 0, 0);
+  obs1.setStatic(true);
+  world.add(obs1);
+  
+   obs1 = new FBox(1, 9);
+ // obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-8, 8);
+  obs1.setFill(0, 0, 0);
+  obs1.setStatic(true);
+  world.add(obs1);
+  
+  obs1 = new FBox(1, 11);
+ // obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-11, 8);
+  obs1.setFill(0, 0, 0);
+  obs1.setStatic(true);
+  world.add(obs1);
+  ////////////
+  
+   obs1 = new FBox(1, 8);
+ // obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-23, 2);
+  obs1.setFill(0, 0, 0);
+  obs1.setStatic(true);
+  world.add(obs1);
+  
+  obs1 = new FBox(1, 4);
+  //obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-20, 8);
+  obs1.setFill(0, 0, 0);
+  obs1.setStatic(true);
+  world.add(obs1);
+  
+  
+  obs1 = new FBox(1, 3);
+ // obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-20, 2);
+  obs1.setFill(0, 0, 0);
+  obs1.setStatic(true);
+  world.add(obs1);
+  
+  
+  obs1 = new FBox(1, 9);
+ // obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-17, 8);
+  obs1.setFill(0, 0, 0);
+  obs1.setStatic(true);
+  world.add(obs1);
+  
+ obs1 = new FBox(1, 9);
+ // obs1.attachImage(loadImage("img/maze.png"));
+  obs1.setPosition(worldWidth-14, 2);
+  obs1.setFill(0, 0, 0);
+  obs1.setRotation(2);
+  obs1.setRestitution(1);
+  obs1.setStatic(false);
+  obs1.setDensity(1);
+  obs1.setVelocity(0,1);
+  world.add(obs1);
+  
+  
   /* Setup the Virtual Coupling Contact Rendering Technique */
   haply_avatar = loadImage("img/dungbeetle_cut.png"); 
   haply_avatar.resize((int)(hAPI_Fisica.worldToScreen(2)), (int)(hAPI_Fisica.worldToScreen(2)));
@@ -149,7 +227,7 @@ void setup() {
   s.h_avatar.setSize(0.5);
   s.h_avatar.setDensity(400); 
   s.h_avatar.setFill(255, 255, 255);
-  s.init(world, edgeTopLeftX+worldWidth/2, edgeTopLeftY+2); 
+  s.init(world, worldWidth - 27, 8); 
 
   /* World conditions setup */
   world.setGravity((0.0), (300.0)); //1000 cm/(s^2)
@@ -157,7 +235,7 @@ void setup() {
   world.setEdgesRestitution(.4);
   world.setEdgesFriction(0.5);
   
-  square_light = new FBox(12.5,9);
+/*  square_light = new FBox(12.5,9);
   square_light.setPosition(3*worldWidth/4, worldHeight/2);
   square_light.setFill(0, 0, 0, 0);
   square_light.setDensity(100);
@@ -174,7 +252,7 @@ void setup() {
   square_dense.setNoStroke();
   square_dense.setStatic(true);
   world.add(square_dense);
-
+*/
   world.draw();
 
 
@@ -190,12 +268,14 @@ void setup() {
 
 
 /* draw section ********************************************************************************************************/
-void draw() {
+void draw() {  
   /* put graphical code here, runs repeatedly at defined framerate in setup, else default at 60fps: */
-  background(bg);
+  background(img);
   world.draw();
   
 }
+
+
 /* end draw section ****************************************************************************************************/
 
 
@@ -222,21 +302,13 @@ class SimulationThread implements Runnable {
     f_ee.set(-s.getVCforceX(), s.getVCforceY());
     f_ee.div(20000); //
     
-    if (s.h_avatar.isTouchingBody(square_light)){
-      s.h_avatar.setDamping(10);
-      s.h_avatar.setHapticStiffness(25000);
-      //println("inside square light");
-    } else{
-      s.h_avatar.setDamping(350);
-      s.h_avatar.setHapticStiffness(25000);
-      //println("inside square dense");
-    }
     torques.set(widgetOne.set_device_torques(f_ee.array()));
     widgetOne.device_write_torques();
 
     world.step(1.0f/1000.0f);
 
     rendering_force = false;
+
   }
 }
 /* end simulation section **********************************************************************************************/
